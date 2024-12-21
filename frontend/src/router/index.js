@@ -1,5 +1,3 @@
-// router/index.ts
-
 // Existing imports and setup
 import { createRouter, createWebHistory } from "vue-router/auto";
 import { setupLayouts } from "virtual:generated-layouts";
@@ -25,14 +23,13 @@ const router = createRouter({
 
 // Prevent browser back/forward navigation (when logged out or on restricted routes)
 function preventBackNavigation() {
-  // Push a new history state to the browser history
   history.pushState(null, document.title, location.href);
   window.onpopstate = () => {
     history.pushState(null, document.title, location.href); // Re-push state to prevent going back
   };
 }
 
-// Global authentication and role-based guard
+// Global authentication guard
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
 
@@ -42,11 +39,11 @@ router.beforeEach((to, from, next) => {
   }
 
   const isAuthenticated = !!authStore.accessToken;
-  const isSuperuser = JSON.parse(localStorage.getItem("is_superuser") || "false"); // Retrieve is_superuser status
-  const hasVisitedDashboard = JSON.parse(localStorage.getItem("hasVisitedDashboard") || "false"); // Initialize hasVisitedDashboard
+  const hasVisitedDashboard = JSON.parse(
+    localStorage.getItem("hasVisitedDashboard") || "false"
+  ); // Track dashboard visit
 
   console.log("isAuthenticated:", isAuthenticated);
-  console.log("Is Superuser:", isSuperuser); // Debugging superuser status
 
   // Pages that don't require authentication
   const publicPages = ["/"];
@@ -59,14 +56,8 @@ router.beforeEach((to, from, next) => {
     return next("/");
   }
 
-  // Restrict access to the Dashboard for non-superusers
-  if (to.path === "/Dashboard" && !isSuperuser) {
-    alert("Access denied: Only superusers can access the Dashboard.");
-    return next("/Chat");
-  }
-
-  // Redirect superuser to the dashboard on first login if they haven't visited it yet
-  if (isAuthenticated && isSuperuser && !hasVisitedDashboard) {
+  // Redirect to the dashboard on first login if the user hasn't visited it yet
+  if (isAuthenticated && !hasVisitedDashboard) {
     localStorage.setItem("hasVisitedDashboard", "true"); // Set flag to true after visiting dashboard
     return next("/Dashboard");
   }
@@ -106,12 +97,10 @@ function logout() {
 
   // Clear the authentication token from localStorage
   localStorage.removeItem("auth_token");
-  localStorage.removeItem("Role");
   alert("Logout successful");
 
-  // Reset token and role in the store
+  // Reset token in the store
   authStore.accessToken = null;
-  authStore.userRole = null;
 
   // Redirect to login page or home page
   router.push("/login"); // Redirect to login after logout

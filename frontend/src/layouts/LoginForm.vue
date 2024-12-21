@@ -45,8 +45,8 @@ export default {
         alert("Login failed");
       } else {
         alert("Login successful");
-        const redirect = router.currentRoute.value.query.redirect || "/dashboard";
-        router.push(redirect);
+       
+        router.push("/chat");
       }
     };
 

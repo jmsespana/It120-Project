@@ -12,7 +12,9 @@ import App from "./App.vue";
 // Disable specific Vue warnings
 const app = createApp(App);
 app.config.warnHandler = (msg, vm, trace) => {
-  // Suppress the warning by doing nothing
+  // You can log the message or completely suppress it
+ 
+  // Optionally suppress the warning by doing nothing
 };
 
 // Create the Vue app instance
