@@ -2,10 +2,10 @@
 <v-container fluid>
   <br> <br> <br> <br> <br>
   <v-row  justify="center" align="center">
-    <v-col cols="2">
-     
-    </v-col>
-      <v-col  cols="4">
+      <v-col  cols="8">
+       
+      </v-col>
+      <v-col cols="4">
         <login-form class="px-10">
           <template #footer>
             <v-card-text class="text-center mt-3 mb-5">
@@ -21,9 +21,6 @@
             </v-card-text>
           </template>
         </login-form>
-      </v-col>
-      <v-col cols="2">
-     
       </v-col>
     </v-row>
 </v-container>

@@ -158,13 +158,13 @@ export default {
       try {
         const receiverId = this.selectedReceiver.id;
 
-        const response = await axios.get('http://127.0.0.1:8000/chat/api/messages-by-receiver/', {
+        const response = await axios.get('http://127.0.0.1:8000/chat/api/messages/', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
           params: {
-            sender_id: receiverId,
-            receiver_id: this.user.id,
+            receiver_id: receiverId,
+            sender_id: this.user.id,
           },
         });
 

@@ -97,11 +97,7 @@ const fetchUsers = async () => {
       username: user.name,
       email: user.email,
       status: "active",
-      is_superuser: user.is_superuser,
-      
     }));
-    console.log("users", users.value.is_superuser);
-    console.log("users", users.value);
   } catch (err) {
     console.error("Error fetching users:", err.message);
   }

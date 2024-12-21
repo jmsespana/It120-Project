@@ -143,36 +143,3 @@ class MessageViewSet(viewsets.ModelViewSet):
             decrypted_messages.append(decrypted_message)
 
         return Response(decrypted_messages)
-
-    @action(detail=False, methods=['get'], url_path='specific-chat')
-    def get_specific_chat(self, request):
-        sender_id = request.query_params.get('sender_id')
-        receiver_id = request.query_params.get('receiver_id')
-
-        if not sender_id or not receiver_id:
-            return Response({'detail': 'Both sender_id and receiver_id parameters are required'}, status=400)
-
-        try:
-            sender_id = int(sender_id)
-            receiver_id = int(receiver_id)
-        except ValueError:
-            return Response({'detail': 'Invalid sender_id or receiver_id format'}, status=400)
-
-        # Retrieve messages for the given sender and receiver IDs
-        messages = Message.objects.filter(
-            sender__id=sender_id, receiver__id=receiver_id
-        ).order_by('timestamp')
-
-        # Decrypt the message content
-        decrypted_messages = []
-        for message in messages:
-            decrypted_content = self.cipher.decrypt(message.content.encode()).decode()
-            decrypted_message = {
-                'sender': message.sender.username,
-                'receiver': message.receiver.username,
-                'content': decrypted_content,
-                'timestamp': message.timestamp,
-            }
-            decrypted_messages.append(decrypted_message)
-
-        return Response(decrypted_messages)

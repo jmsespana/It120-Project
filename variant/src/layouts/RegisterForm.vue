@@ -33,10 +33,6 @@
         required
         outlined
       />
-      <v-radio-group v-model="registerAs" row>
-        <v-radio label="Superuser" value="superuser"></v-radio>
-        <v-radio label="Staff" value="staff"></v-radio>
-      </v-radio-group>
       <v-row class="pb-10 pt-2">
         <v-col>
           <v-btn @click="handleBack" color="grey-darken-2" block>Back</v-btn>
@@ -65,7 +61,6 @@ export default {
     const email = ref("");
     const password = ref("");
     const confirmPassword = ref("");
-    const registerAs = ref("staff"); // Default to staff
 
     const handleRegister = async () => {
       if (
@@ -82,8 +77,7 @@ export default {
         username.value,
         email.value,
         password.value,
-        confirmPassword.value,
-        registerAs.value
+        confirmPassword.value
       );
 
       if (success) {
@@ -102,7 +96,6 @@ export default {
       email,
       password,
       confirmPassword,
-      registerAs,
       handleRegister,
       handleBack,
     };

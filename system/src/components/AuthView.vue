@@ -2,7 +2,7 @@
 <v-container fluid>
   <br> <br> <br> <br> <br>
   <v-row  justify="center" align="center">
-      <v-col  cols="3 ">
+      <v-col  cols="8">
        
       </v-col>
       <v-col cols="4">
@@ -22,9 +22,6 @@
           </template>
         </login-form>
       </v-col>
-      <v-col  cols="3">
-       
-      </v-col>
     </v-row>
 </v-container>
 
@@ -38,7 +35,6 @@
         </register-form>
       </v-col>
     </v-row>
-    
   </v-dialog>
 </template>
 

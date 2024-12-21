@@ -13,7 +13,7 @@ import App from "./App.vue";
 const app = createApp(App);
 app.config.warnHandler = (msg, vm, trace) => {
   // You can log the message or completely suppress it
- 
+  console.log(`Warning: ${msg}`);
   // Optionally suppress the warning by doing nothing
 };
 

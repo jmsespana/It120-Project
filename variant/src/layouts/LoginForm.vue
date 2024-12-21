@@ -1,6 +1,6 @@
 <template>
   <v-card class="bg-card" elevation="8">
-    <h1 class="text-center py-8">Decryptor</h1>
+    <h1 class="text-center py-8">$Receiver</h1>
 
     <v-form ref="form" @submit.prevent="handleLogin">
       <v-text-field

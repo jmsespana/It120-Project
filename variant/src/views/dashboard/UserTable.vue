@@ -22,14 +22,6 @@ const headers = [
     title: "Status",
     key: "status",
   },
-  {
-    title: "Admin",
-    key: "is_superuser",
-  },
-  {
-    title: "Staff",
-    key: "is_staff",
-  },
 ];
 
 const resolveUserStatusVariant = (stat) => {
@@ -72,28 +64,6 @@ const resolveUserStatusVariant = (stat) => {
           class="text-capitalize"
         >
           {{ item.status }}
-        </v-chip>
-      </template>
-
-      <!-- Admin -->
-      <template #item.is_superuser="{ item }">
-        <v-chip
-          :color="item.is_superuser ? 'success' : 'error'"
-          size="small"
-          class="text-capitalize"
-        >
-          {{ item.is_superuser ? 'True' : 'False' }}
-        </v-chip>
-      </template>
-
-      <!-- Staff -->
-      <template #item.is_staff="{ item }">
-        <v-chip
-          :color="item.is_staff ? 'success' : 'error'"
-          size="small"
-          class="text-capitalize"
-        >
-          {{ item.is_staff ? 'True' : 'False' }}
         </v-chip>
       </template>
 

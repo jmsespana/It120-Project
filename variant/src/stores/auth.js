@@ -19,13 +19,12 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
-    async login(email, password, loginAs) {
+    async login(email, password) {
       try {
         // First, authenticate the user with the login credentials
         const response = await axios.post("/api/login/", {
           email: email,
           password: password,
-          login_as: loginAs, // Send the login type
         });
 
         this.accessToken = response.data.access; // Set token in store
@@ -46,9 +45,6 @@ export const useAuthStore = defineStore("auth", {
         this.user = userResponse.data; // Save the user data to the store
         localStorage.setItem("userId", userId); // Save the user ID to localStorage
 
-        // Store is_superuser status in localStorage
-        localStorage.setItem("is_superuser", JSON.stringify(userResponse.data.is_superuser));
-
         // Log the user ID for debugging
         console.log("User ID:", userId);
 
@@ -63,7 +59,7 @@ export const useAuthStore = defineStore("auth", {
     },
 
     // Register action: sends a request to register the user
-    async register(name, email, password, confirmPassword, registerAs) {
+    async register(name, email, password, confirmPassword) {
       const toast = useToast(); // Initialize the toast
 
       // Check if passwords match
@@ -80,7 +76,6 @@ export const useAuthStore = defineStore("auth", {
           name,
           password1: password,
           password2: confirmPassword, // Ensure passwords match
-          register_as: registerAs, // Send the registration type
         });
 
         if (response.data.message === "success") {

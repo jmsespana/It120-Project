@@ -42,11 +42,13 @@ router.beforeEach((to, from, next) => {
   }
 
   const isAuthenticated = !!authStore.accessToken;
-  const isSuperuser = JSON.parse(localStorage.getItem("is_superuser") || "false"); // Retrieve is_superuser status
-  const hasVisitedDashboard = JSON.parse(localStorage.getItem("hasVisitedDashboard") || "false"); // Initialize hasVisitedDashboard
+  const userRole = JSON.parse(localStorage.getItem("Role") || "false"); // false as default if no role is found
+  const hasVisitedDashboard = JSON.parse(
+    localStorage.getItem("hasVisitedDashboard") || "false"
+  ); // Track dashboard visit
 
   console.log("isAuthenticated:", isAuthenticated);
-  console.log("Is Superuser:", isSuperuser); // Debugging superuser status
+  console.log("User Role:", userRole); // Debugging role
 
   // Pages that don't require authentication
   const publicPages = ["/"];
@@ -59,14 +61,8 @@ router.beforeEach((to, from, next) => {
     return next("/");
   }
 
-  // Restrict access to the Dashboard for non-superusers
-  if (to.path === "/Dashboard" && !isSuperuser) {
-    alert("Access denied: Only superusers can access the Dashboard.");
-    return next("/Chat");
-  }
-
-  // Redirect superuser to the dashboard on first login if they haven't visited it yet
-  if (isAuthenticated && isSuperuser && !hasVisitedDashboard) {
+  // Redirect admin to the dashboard on first login if they haven't visited it yet
+  if (isAuthenticated && userRole === true && !hasVisitedDashboard) {
     localStorage.setItem("hasVisitedDashboard", "true"); // Set flag to true after visiting dashboard
     return next("/Dashboard");
   }

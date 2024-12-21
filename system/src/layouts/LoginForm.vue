@@ -1,6 +1,6 @@
 <template>
   <v-card class="bg-card" elevation="8">
-    <h1 class="text-center py-8">Sender</h1>
+    <h1 class="text-center py-8">$Title Here</h1>
 
     <v-form ref="form" @submit.prevent="handleLogin">
       <v-text-field
@@ -28,24 +28,28 @@
 </template>
 
 <script>
-import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from "@/stores/auth"; // Importing the merged auth store
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
+
 export default {
   setup() {
-    const authStore = useAuthStore();
+    const authStore = useAuthStore(); // Access the auth store
     const router = useRouter();
-    const email = ref("");
-    const password = ref("");
+    const email = ref(""); // Bind email input
+    const password = ref(""); // Bind password input
+   
 
     const handleLogin = async () => {
-      const success = await authStore.login(email.value, password.value);
+      const success = await authStore.login(email.value, password.value); // Use the store's login action
       if (!success) {
-        alert("Login failed");
+       alert("Login failed"); 
       } else {
-        alert("Login successful");
-        const redirect = router.currentRoute.value.query.redirect || "/dashboard";
+       alert("Login successful"); 
+        // Redirect to the previously requested page, or to /dashboard if none is specified
+        const redirect =
+          router.currentRoute.value.query.redirect || "/dashboard";
         router.push(redirect);
       }
     };

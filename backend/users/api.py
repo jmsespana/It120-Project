@@ -33,8 +33,6 @@ def me(request):
             'id': request.user.id,  # Now an integer (BigAutoField)
             'name': request.user.name,
             'email': request.user.email,
-            'is_superuser': request.user.is_superuser,
-            'is_staff': request.user.is_staff,
         })
     return JsonResponse({'error': 'User not authenticated'}, status=401)
 
@@ -53,13 +51,7 @@ def signup(request):
     })
 
     if form.is_valid():
-        user = form.save(commit=False)
-        register_as = data.get('register_as')
-        if register_as == 'superuser':
-            user.is_superuser = True
-        elif register_as == 'staff':
-            user.is_staff = True
-        user.save()
+        form.save()
     else:
         message = 'error'
         return JsonResponse({'message': message, 'errors': form.errors})
@@ -72,22 +64,16 @@ def signup(request):
 def login(request):
     email = request.data.get('email')
     password = request.data.get('password')
-    login_as = request.data.get('login_as')  # New field to determine login type
     
     user = authenticate(username=email, password=password)
     if user is not None:
-        if login_as == 'superuser' and not user.is_superuser:
-            return JsonResponse({'message': 'User is not a superuser'}, status=403)
-        if login_as == 'staff' and not user.is_staff:
-            return JsonResponse({'message': 'User is not staff'}, status=403)
-        
         # Generate or retrieve the token for the user
         token, created = Token.objects.get_or_create(user=user)
         return JsonResponse({
             'message': 'success',
             'token': token.key,
             'user': {
-                'id': user.id,
+                'id': user.id,  # Now an integer (BigAutoField)
                 'name': user.get_full_name(),
                 'email': user.email,
             }
