@@ -38,26 +38,34 @@ const resolveUserStatusVariant = (stat) => {
 
 
 <template>
+  <!-- User List Card -->
   <v-card class="user-list-card">
+    
+    <!-- Data Table to display user data -->
     <v-data-table
       :headers="headers"
       :items="userData"
       item-value="id"
       class="user-list-table"
     >
-    <template #item.username="{ item }">
-  <div class="d-flex align-center user-details" style="gap: 3px;">
-    <!-- Add an icon -->
-    <v-icon class="user-icon" style="color: #b8e8e9;">mdi-account</v-icon>
-    <div class="d-flex flex-column">
-      <h6 class="user-list-name">{{ item.username }}</h6>
-      <p class="user-email">{{ item.email }}</p>
-    </div>
-  </div>
-</template>
+      
+      <!-- Username Column -->
+      <template #item.username="{ item }">
+        <div class="d-flex align-center user-details" style="gap: 3px;">
+          
+          <!-- Icon for Username -->
+          <v-icon class="user-icon" style="color: #b8e8e9;">mdi-account</v-icon>
 
-    <!-- Status -->
-    <template #item.status="{ item }">
+          <!-- User Details (Name and Email) -->
+          <div class="d-flex flex-column">
+            <h6 class="user-list-name">{{ item.username }}</h6>
+            <p class="user-email">{{ item.email }}</p>
+          </div>
+        </div>
+      </template>
+
+      <!-- Status Column -->
+      <template #item.status="{ item }">
         <v-chip
           :color="resolveUserStatusVariant(item.status)"
           size="small"
@@ -71,6 +79,7 @@ const resolveUserStatusVariant = (stat) => {
     </v-data-table>
   </v-card>
 </template>
+
 
 
 
@@ -94,7 +103,6 @@ const resolveUserStatusVariant = (stat) => {
   color: #0b2e33;
   font-size: 1.1rem;
 }
-
 
 .user-list-name {
   font-weight: 600;
