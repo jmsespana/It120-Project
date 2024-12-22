@@ -1,15 +1,15 @@
 // Plugins
-import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
-import Fonts from 'unplugin-fonts/vite'
-import Layouts from 'vite-plugin-vue-layouts'
-import Vue from '@vitejs/plugin-vue'
-import VueRouter from 'unplugin-vue-router/vite'
-import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+import AutoImport from 'unplugin-auto-import/vite';
+import Components from 'unplugin-vue-components/vite';
+import Fonts from 'unplugin-fonts/vite';
+import Layouts from 'vite-plugin-vue-layouts';
+import Vue from '@vitejs/plugin-vue';
+import VueRouter from 'unplugin-vue-router/vite';
+import Vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
 
 // Utilities
-import { defineConfig } from 'vite'
-import { fileURLToPath, URL } from 'node:url'
+import { defineConfig } from 'vite';
+import { fileURLToPath, URL } from 'node:url';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -17,31 +17,29 @@ export default defineConfig({
     VueRouter(),
     Layouts(),
     Vue({
-      template: { transformAssetUrls }
+      template: { transformAssetUrls },
     }),
-    // https://github.com/vuetifyjs/vuetify-loader/tree/master/packages/vite-plugin#readme
     Vuetify({
       autoImport: true,
       styles: {
-        configFile: 'src/styles/settings.scss',
+        configFile: 'src/styles/settings.scss', // Ensure this file exists!
       },
     }),
     Components(),
     Fonts({
       google: {
-        families: [{
-          name: 'Roboto',
-          styles: 'wght@100;300;400;500;700;900',
-        }],
+        families: [
+          {
+            name: 'Roboto',
+            styles: 'wght@100;300;400;500;700;900',
+          },
+        ],
       },
     }),
     AutoImport({
-      imports: [
-        'vue',
-        'vue-router',
-      ],
+      imports: ['vue', 'vue-router'],
       eslintrc: {
-        enabled: true,
+        enabled: true, // Generate ESLint configuration
       },
       vueTemplate: true,
     }),
@@ -49,26 +47,19 @@ export default defineConfig({
   define: { 'process.env': {} },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)), // Ensure `@` works as alias for `src/`
     },
-    extensions: [
-      '.js',
-      '.json',
-      '.jsx',
-      '.mjs',
-      '.ts',
-      '.tsx',
-      '.vue',
-    ],
+    extensions: ['.js', '.json', '.jsx', '.mjs', '.ts', '.tsx', '.vue'],
   },
   server: {
-    port: 3000,
+    port: 3000, // Default development server port
+    host: '0.0.0.0', // Allow access from local network (optional)
   },
   css: {
     preprocessorOptions: {
       sass: {
-        api: 'modern-compiler',
+        api: 'modern-compiler', // Ensure compatibility with modern Sass compilers
       },
     },
   },
-})
+});
