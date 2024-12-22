@@ -58,42 +58,55 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
-    // Register action: sends a request to register the user
-    async register(name, email, password, confirmPassword) {
-      const toast = useToast(); // Initialize the toast
-
-      // Check if passwords match
+    async register(name, email, password, confirmPassword, toast) {
       if (password !== confirmPassword) {
         this.error = "Passwords do not match";
-        toast.error("Passwords do not match"); // Show error toast
+        toast.error(this.error);
         return false;
       }
-
+    
       try {
-        // Send the POST request to the signup API
         const response = await axios.post("http://127.0.0.1:8000/api/signup/", {
           email,
           name,
           password1: password,
-          password2: confirmPassword, // Ensure passwords match
+          password2: confirmPassword,
         });
-
+    
         if (response.data.message === "success") {
-          this.user = response.data.user; // Assuming user data is returned
-          toast.success("Registration successful!"); // Show success toast
+          this.user = response.data.user;
+          toast.success("Registration successful!");
           return true;
         } else {
-          this.error = response.data.errors || "An unknown error occurred";
-          toast.error(this.error); // Show error toast if registration fails
+          this.error = response.data.errors || "An unknown error occurred.";
+          toast.error(this.error);
           return false;
         }
       } catch (error) {
-        this.error = error.response?.data?.detail || error.message;
-        console.error("Registration error:", error);
-        toast.error(this.error); // Show error toast in case of network failure
+        let errorMessage = "An unknown error occurred."; // Default message
+    
+        if (error.response) {
+          const responseData = error.response.data;
+    
+          if (responseData?.errors) {
+            // If errors field is present
+            errorMessage = Object.values(responseData.errors).join(", ");
+          } else if (responseData?.detail) {
+            // If detail field is present
+            errorMessage = responseData.detail;
+          }
+        } else if (error.message) {
+          // Handle network error
+          errorMessage = "Network error: Unable to reach the server. Please try again.";
+        }
+    
+        this.error = errorMessage;
+        console.error("Registration error:", errorMessage); // Log the error message
+        toast.error(errorMessage);
         return false;
       }
     },
+    
 
     // Logout action: clears both the store and localStorage
     logout() {
