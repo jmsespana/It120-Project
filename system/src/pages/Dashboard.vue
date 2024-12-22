@@ -41,7 +41,7 @@ watch(activeTab, (newTab) => {
 <template>
   <v-app class="app-container">
     <!-- App Bar with Logo and Title -->
-    <v-app-bar app class="app-bar" style="background: linear-gradient(45deg, #0b2e33, #4f7c82);">
+    <v-app-bar app class="app-bar" style="background: linear-gradient(45deg, #4f7c82, #0b2e33);">
       <!-- Logo and App Title -->
       <v-row align="center" class="d-flex justify-start">
         <v-img 
@@ -50,7 +50,7 @@ watch(activeTab, (newTab) => {
           max-width="80px"
           class="navbar-logo me-2"
         />
-        <v-toolbar-title class="app-title" style="margin: 0;">SnapTalk</v-toolbar-title>
+        <v-toolbar-title class="app-title" style="margin: 0; color: #0b2e33; font-weight: 900;">SnapTalk</v-toolbar-title>
       </v-row>
 
       <v-spacer></v-spacer>
@@ -97,20 +97,20 @@ watch(activeTab, (newTab) => {
 
 <style scoped>
 .logout-btn {
-    font-size: 1rem;
-    font-weight: bold;
-    background-color: #4F7C82;
-    border: 1px solid #0B2E33;
-    color: #ffffff;
-    border-radius: 8px;
-    transition: transform 0.3s ease, background-color 0.3s ease;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #4F7C82;
+  border: 1px solid #0B2E33;
+  color: #ffffff;
+  border-radius: 8px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 .logout-btn:hover {
-    background-color: #B8E3E9;
-    color: #0B2E33;
-    transform: scale(1.05);
-    cursor: pointer;
+  background-color: #B8E3E9;
+  color: #0B2E33;
+  transform: scale(1.05);
+  cursor: pointer;
 }
 
 .app-bar {
