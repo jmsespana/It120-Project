@@ -17,7 +17,7 @@ export default {
       if (!success) {
        alert("Login failed"); 
       } else {
-       alert("Login successful"); 
+       alert("Welcome to SnapTalk! Login successful. Enjoy seamless communication."); 
         // Redirect to the previously requested page, or to /dashboard if none is specified
         const redirect =
           router.currentRoute.value.query.redirect || "/dashboard";

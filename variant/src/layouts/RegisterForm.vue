@@ -34,6 +34,7 @@ export default {
       );
 
       if (success) {
+        alert("Welcome to SnapTalk! Your registration was successful. Let's get started!"); // Success alert
         emit("update:modelValue", false); // Close dialog after successful registration
       } else {
         // Error handling is done in the authStore
@@ -55,7 +56,6 @@ export default {
   },
 };
 </script>
-
 
 
 <template>
