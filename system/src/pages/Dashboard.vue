@@ -1,81 +1,3 @@
-<template>
-  <v-app class="app-container">
-    <!-- Top Navigation Bar -->
-    <v-app-bar app color="#151515" class="px-5">
-      <!-- App Title -->
-      <v-toolbar-title class="text-h5 font-weight-black">Title</v-toolbar-title>
-      
-      <!-- Navigation Tabs -->
-      <v-tabs v-model="activeTab" class="mx-5">
-        <v-tab value="dashboard">
-          <v-icon left class="me-1">mdi-view-dashboard</v-icon> Dashboard
-        </v-tab>
-        <v-tab value="chats">
-          <v-icon left class="me-1">mdi-chat</v-icon> Send a Message
-        </v-tab>
-      </v-tabs>
-      
-      <v-spacer></v-spacer>
-      
-      <!-- Notification Icon with Badge -->
-      <v-btn size="x-small" variant="tonal" icon class="mr-3">
-        <v-badge color="red" dot>
-          <v-icon>mdi-bell</v-icon>
-        </v-badge>
-      </v-btn>
-      
-      <!-- User Settings Menu -->
-      <v-menu transition="slide-y-transition">
-        <template v-slot:activator="{ props }">
-          <v-btn rounded="xl" size="large" variant="tonal" v-bind="props">
-            <v-avatar size="25" class="mr-2"></v-avatar>
-            <v-icon color="white">mdi-cog</v-icon>
-          </v-btn>
-        </template>
-        
-        <v-sheet class="pa-0 mt-2 me-1 menu-card" color="grey-darken-3">
-          <div>
-            
-          
-            <v-btn
-              class="justify-start"
-              rounded="0"
-              variant="text"
-              size="large"
-              block
-              @click="handleLogoutClick"
-              style="text-transform: none"
-            >
-              <v-row align="center" no-gutters>
-                <v-col cols="auto">
-                  <v-icon class="me-3" left>mdi-logout</v-icon>
-                </v-col>
-                <v-col @click="logout"> Logout </v-col>
-              </v-row>
-            </v-btn>
-          </div>
-        </v-sheet>
-      </v-menu>
-    </v-app-bar>
-
-    <!-- Main Content -->
-    <v-main class="custom-main">
-      <v-container fluid class="main-container pa-8 rounded-lg">
-        <v-row v-if="activeTab === 'dashboard'">
-          <v-col cols="12">
-            <UserTable :userData="users" />
-          </v-col>
-        </v-row>
-        <v-row v-else-if="activeTab === 'chats'">
-          <v-col cols="12">
-            <ChatBox />
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-main>
-  </v-app>
-</template>
-
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import axios from "axios";
@@ -116,8 +38,118 @@ watch(activeTab, (newTab) => {
 });
 </script>
 
+<template>
+  <v-app class="app-container">
+    <!-- App Bar with Logo and Title -->
+    <v-app-bar app class="app-bar" style="background: linear-gradient(45deg, #0b2e33, #4f7c82);">
+      <!-- Logo and App Title -->
+      <v-row align="center" class="d-flex justify-start">
+        <v-img 
+          src="/src/images/logo.png" 
+          alt="SnapTalk Logo" 
+          max-width="80px"
+          class="navbar-logo me-2"
+        />
+        <v-toolbar-title class="app-title" style="margin: 0;">SnapTalk</v-toolbar-title>
+      </v-row>
+
+      <v-spacer></v-spacer>
+
+      <!-- Logout Button -->
+      <v-col class="d-flex justify-end">
+        <v-btn @click="logout" class="logout-btn">
+          <v-icon left>mdi-logout</v-icon>
+          Logout
+        </v-btn>
+      </v-col>
+    </v-app-bar>
+
+    <!-- Main Content Area -->
+    <v-main class="main-section">
+      <v-container fluid class="content-container">
+        <!-- Navigation Tabs -->
+        <v-tabs v-model="activeTab" class="tab-container" style="margin-left: 500px; margin-top: 30px;">
+          <v-tab value="dashboard">
+            <v-icon left class="tab-icon">mdi-view-dashboard-outline</v-icon> Dashboard
+          </v-tab>
+          <v-tab value="chats">
+            <v-icon left class="tab-icon">mdi-message-text-outline</v-icon> Start a Chat
+          </v-tab>
+        </v-tabs>
+
+        <!-- Dashboard Content -->
+        <v-row v-if="activeTab === 'dashboard'">
+          <v-col cols="12">
+            <UserTable :userData="users" />
+          </v-col>
+        </v-row>
+
+        <!-- Chat Content -->
+        <v-row v-else-if="activeTab === 'chats'">
+          <v-col cols="12">
+            <ChatBox />
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+  </v-app>
+</template>
+
 <style scoped>
-.custom-main {
-  padding-top: 64px; /* To account for the app bar height */
+.logout-btn {
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: #4F7C82;
+    border: 1px solid #0B2E33;
+    color: #ffffff;
+    border-radius: 8px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #B8E3E9;
+    color: #0B2E33;
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+.app-bar {
+  color: white;
+  padding: 5px 15px;
+}
+
+.app-title {
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 30px;
+}
+
+.nav-tabs {
+  background-color: #4f7c82;
+  border-radius: 8px;
+  padding: 5px 15px;
+}
+
+.tab-icon {
+  color: #B8E3E9;
+}
+
+.v-tab {
+  color: #B8E3E9;
+  text-transform: uppercase;
+  font-size: 20px;
+  font-weight: 700;
+  transition: transform 0.2s ease-in-out;
+}
+
+.v-tab:hover {
+  transform: translateY(-3px);
+}
+
+.main-section {
+  background-color: #0b2e33;
+  color: white;
 }
 </style>
+
