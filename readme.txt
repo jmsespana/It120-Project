@@ -1,7 +1,7 @@
-Project Overview:
--This project involves developing Two (2) Django REST Framework (DRF) applications that communicate securely using encrypted or hashed messages. The focus is on building secure APIs with middleware for encryption/decryption and integrating essential features to ensure robust and secure communication.
+🌟 Project Overview:
+-   This project involves developing Two (2) Django REST Framework (DRF) applications that communicate securely using encrypted or hashed messages. The focus is on building secure APIs with middleware for encryption/decryption and integrating essential features to ensure robust and secure communication.
 
-Features:
+📋 Features:
 -	Login and Registration
 User authentication is implemented in both applications to ensure secure access.
 
@@ -15,7 +15,7 @@ Custom middleware handles encryption, hashing, and request validation for enhanc
 -	Dashboard
 An intuitive interface displays and manages all users and messages.
 
-Requirements:
+🛠️ Requirements:
 To set up and run the applications, follow these steps:
 
 1.Clone the Repository
@@ -35,9 +35,9 @@ python manage.py runserver
 Use the following test accounts for authentication and testing:
 
 o	Account 1
-Email: test@gmail.com
-Password: test123/.
-o	Account 2
-Email: test2@gmail.com
-Password: Sample123/.
+📧 Email: test@gmail.com
+🔑 Password: test123/.
 
+o	Account 2
+📧 Email: test2@gmail.com
+🔑 Password: Sample123/.
