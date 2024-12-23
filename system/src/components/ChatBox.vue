@@ -141,37 +141,30 @@ export default {
 };
 </script>
 
-
-
 <template>
   <v-container style="margin-top: 60px;">
     <v-row>
       <!-- User List Section -->
       <v-col cols="12" md="4">
         <v-card class="mb-3 inbox-card timeline-card" elevation="5">
-          <!-- Card Title -->
           <v-card-title>
             <div class="headline inbox-title">
               <v-icon class="mr-1" color="#0b2e33">mdi-account-multiple</v-icon> Available Users
             </div>
           </v-card-title>
 
-          <!-- User List -->
           <v-list style="background-color: #4f7c82;">
-            <!-- Display Users If Available -->
             <v-list-item-group v-if="filteredUsers.length > 0">
+              <!-- Loop through available users -->
               <v-list-item
                 v-for="user in filteredUsers"
                 :key="user.id"
                 @click="selectReceiver(user)"
                 class="inbox-item"
               >
-                <!-- User Avatar -->
                 <v-list-item-avatar>
                   <v-img :src="user.avatar" />
                 </v-list-item-avatar>
-
-                <!-- User Name -->
                 <v-list-item-content>
                   <v-list-item-title>
                     <v-icon style="color: #b8e8e9;">mdi-account</v-icon>
@@ -181,7 +174,7 @@ export default {
               </v-list-item>
             </v-list-item-group>
 
-            <!-- Display No Conversations Message -->
+            <!-- Placeholder if no users available -->
             <v-list-item v-else>
               <v-list-item-content>
                 <v-list-item-title>No conversations available...</v-list-item-title>
@@ -191,14 +184,11 @@ export default {
         </v-card>
       </v-col>
 
-      <!-- Message Section -->
+      <!-- Message Section (for selected user) -->
       <v-col cols="12" md="8">
-        <!-- Chat Card: Display When User is Selected -->
         <v-card v-if="selectedReceiver" class="chat-section" elevation="3" style="background-color: #0b2e33;">
-          <!-- Chat Header -->
           <v-card-title class="d-flex align-center chat-header">
             <div>
-              <!-- Chat Title -->
               <div class="chat-title-main">
                 <v-icon size="28px">mdi-message-bulleted</v-icon> SnapTalk
               </div>
@@ -208,32 +198,41 @@ export default {
             </div>
           </v-card-title>
 
-          <!-- Messages Display -->
+          <!-- Displaying Messages -->
           <div class="chat-body">
-            <!-- Loop Through Messages -->
-            <div
-              v-for="message in messages"
-              :key="message.id"
+            <div 
+              v-for="message in messages" 
+              :key="message.id" 
               :class="{
                 'message-item': true,
                 'sender': message.sender === user.id,
                 'receiver': message.sender !== user.id
               }"
             >
-              <!-- Message Bubble -->
-              <div class="message-bubble">
+              <div class="message-bubble" :class="{
+                'sent': message.sender === user.id,       
+                'sent-blue': message.sender === user.id,  
+                'received-white': message.sender !== user.id 
+              }">
                 {{ message.content }}
-                <!-- Timestamp -->
                 <div class="timestamp">
                   {{ new Date(message.timestamp).toLocaleString() }}
                 </div>
+                <!-- Delete message icon -->
+                <v-icon 
+                  class="delete-icon" 
+                  @click="deleteMessage(message.id)" 
+                  color="red" 
+                  style="font-size: medium; margin-right: 8px;"
+                >
+                  mdi-delete-outline
+                </v-icon>
               </div>
             </div>
           </div>
 
-          <!-- Send Message Section -->
+          <!-- Message Sending Footer -->
           <div class="chat-footer" style="display: flex; align-items: center;">
-            <!-- Message Input -->
             <v-textarea
               v-model="newMessage"
               placeholder="Type a message..."
@@ -243,21 +242,18 @@ export default {
               class="message-input"
               style="width: 70%; max-width: 650px; margin-left: 10px; margin-right: 25px; margin-top: 15px;"
             />
-            <!-- Send Button -->
             <v-btn @click="sendMessage" :disabled="!newMessage" class="send-btn">
-              <v-icon left>mdi-send</v-icon>
+              <v-icon left>mdi-send</v-icon> Send
             </v-btn>
           </div>
         </v-card>
 
-        <!-- No User Selected: Placeholder Card -->
+        <!-- No User Selected (Placeholder Card) -->
         <v-card v-else class="pa-3" elevation="5" style="background-color: #4f7c82;">
           <v-card-title>
             <div class="card-content">
-              <!-- Placeholder Image -->
               <v-img src="/src/images/robot.png" alt="No user selected" class="left-img" style="max-width: 80%;" />
               <div class="right-content">
-                <!-- Welcome Message -->
                 <div class="headline" style="font-size: 20px;">Welcome to SnapTalk – Start Seamless Conversations</div>
                 <div class="caption">
                   Select a user from inbox to start a secure, private conversation here on SnapTalk.
@@ -270,7 +266,6 @@ export default {
     </v-row>
   </v-container>
 </template>
-
 
 
 
@@ -324,10 +319,6 @@ export default {
   color: #ffffff;
 }
 
-
-
-
-/* Overall chat container */
 .chat-section {
   display: flex;
   flex-direction: column;
@@ -337,7 +328,6 @@ export default {
   border: 2px solid #b8e8e9;
 }
 
-/* Chat Header */
 .chat-header {
   background-color: #b8e8e9;
   padding: 10px;
@@ -359,7 +349,7 @@ export default {
   padding: 20px;
   max-height: 500px;
   overflow-y: auto;
-  background-color: #4f7c82;
+  background-color: #4f7c84;
 }
 
 .message-item {
@@ -369,7 +359,7 @@ export default {
 
 .receiver .message-bubble {
   margin-right: auto;
-  background-color: #e5e5ea;
+  background-color: #b8e8e9;
   color: black;
   border-radius: 18px 18px 18px 0;
   max-width: 60%;
@@ -384,7 +374,7 @@ export default {
 }
 
 .timestamp {
-  font-size: 11px;
+  font-size: 10px;
   color: #888;
   margin-top: 5px;
   text-align: right;
@@ -393,7 +383,6 @@ export default {
   color: rgba(0, 0, 0, 0.5);
 }
 
-/* Footer Section (message input) */
 .chat-footer {
   display: flex;
   align-items: center;
@@ -404,7 +393,6 @@ export default {
 .message-input {
   flex: 1;
   margin-right: 15px;
-  color: #0b2e33;
 }
 
 .send-btn {
@@ -413,26 +401,24 @@ export default {
 }
 
 .send-btn:disabled {
-  background-color: #e5e5ea;
-  color: #0b2e33;
+  background-color: #c0c0c0;
+  color: #0b2e33
 }
 
-/* Small tweaks for overall spacing */
 .v-btn {
   border-radius: 30px;
+  margin-right: 30px;
 }
 
 .v-textarea {
-  background-color: #b8e8e9;
   margin-top: 10px;
   margin-right: -5px;
+  color: #0b2e33;
 }
-
 
 .chat-footer .message-input {
-  width: 70% !important; /* Ensures it overrides Vuetify's default styles */
-  max-width: 600px; /* Optional: Limits the maximum width */
+  width: 70% !important; 
+  max-width: 600px;
 }
-
 </style>
 
