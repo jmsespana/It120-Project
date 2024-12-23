@@ -130,6 +130,24 @@ export default {
         console.error("Error sending message:", error);
       }
     },
+      async deleteMessage(messageId) {
+        try {
+          // API call to delete the message
+          await axios.delete(`http://localhost:8000/chat/api/messages/${messageId}/`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+          });
+
+          // Remove the message from both `messages` and `replies` arrays
+          this.messages = this.messages.filter(message => message.id !== messageId);
+          this.replies = this.replies.filter(reply => reply.id !== messageId);
+
+          console.log(`Message with ID ${messageId} successfully deleted.`);
+        } catch (error) {
+          console.error('Error deleting message:', error);
+        }
+      },
     startMessagePolling() {
       setInterval(() => {
         if (this.selectedReceiver) {
@@ -149,7 +167,7 @@ export default {
         <v-card class="mb-3 inbox-card timeline-card" elevation="5">
           <v-card-title>
             <div class="headline inbox-title">
-              <v-icon class="mr-1" color="#0b2e33">mdi-account-multiple</v-icon> Available Users
+              <v-icon class="mr-1" color="#0b2e33">mdi-account-multiple</v-icon> Users
             </div>
           </v-card-title>
 
@@ -198,7 +216,6 @@ export default {
             </div>
           </v-card-title>
 
-          <!-- Displaying Messages -->
           <div class="chat-body">
             <div 
               v-for="message in messages" 
@@ -214,11 +231,25 @@ export default {
                 'sent-blue': message.sender === user.id,  
                 'received-white': message.sender !== user.id 
               }">
-                {{ message.content }}
+                <!-- User Icon -->
+                <div class="icon-wrapper" style="display: flex; align-items: center; margin-bottom: 5px;">
+                  <v-icon 
+                    class="user-icon" 
+                    color="gray" 
+                    style="font-size: 20px; margin-right: 8px;"
+                  >
+                    mdi-account-circle
+                  </v-icon>
+                  <!-- Message Content -->
+                  <span>{{ message.content }}</span>
+                </div>
+                
+                <!-- Timestamp -->
                 <div class="timestamp">
                   {{ new Date(message.timestamp).toLocaleString() }}
                 </div>
-                <!-- Delete message icon -->
+
+                <!-- Delete Message Icon -->
                 <v-icon 
                   class="delete-icon" 
                   @click="deleteMessage(message.id)" 
@@ -230,6 +261,7 @@ export default {
               </div>
             </div>
           </div>
+
 
           <!-- Message Sending Footer -->
           <div class="chat-footer" style="display: flex; align-items: center;">
@@ -312,7 +344,7 @@ export default {
 .timeline-card .inbox-title {
   color: #0b2e33;
   font-weight: bold;
-  margin-left: 55px;
+  margin-left: 105px;
 }
 
 .inbox-item .v-list-item-title {
