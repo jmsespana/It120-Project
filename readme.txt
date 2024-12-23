@@ -18,11 +18,11 @@ An intuitive interface displays and manages all users and messages.
 🛠️ Requirements:
 To set up and run the applications, follow these steps:
 
-1.Clone the Repository
-git clone <repository-url>  
+1. Clone the Repository
+"git clone <repository-url>  
 cd <repository-folder>  
 
-2.Set Up the Backend
+2. Set Up the Backend
 Navigate to the backend folder and execute the following commands:
 
 cd backend  
