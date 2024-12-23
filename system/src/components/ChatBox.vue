@@ -1,113 +1,100 @@
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
   data() {
     return {
       user: {
         id: null,
-        name: '',
-        avatar: '',
+        name: "",
+        avatar: "",
       },
       users: [],
       selectedReceiver: null,
-      newMessage: '',
-      messages: [], // Default value is an empty array to avoid undefined errors
-      replies: [], // Default value is an empty array to avoid undefined errors
+      newMessage: "",
+      messages: [],
     };
   },
   created() {
     this.fetchUserData();
     this.fetchUsers();
-    this.startMessagePolling(); // Start polling for new replies
+    this.startMessagePolling();
   },
   computed: {
     filteredUsers() {
-      return this.users.filter(user => user.id !== this.user.id);
-    }
+      return this.users.filter((user) => user.id !== this.user.id);
+    },
   },
   methods: {
     async fetchUserData() {
       try {
-        const userResponse = await axios.get('http://localhost:8000/api/me/', {
+        const response = await axios.get("http://localhost:8000/api/me/", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         });
-        this.user = userResponse.data;
-        this.fetchMessages();
+        this.user = response.data;
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
       }
     },
     async fetchUsers() {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/users/', {
+        const response = await axios.get("http://127.0.0.1:8000/api/users/", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         });
-        if (response.data.status === 'success' && Array.isArray(response.data.data.users)) {
+        if (response.data.status === "success" && Array.isArray(response.data.data.users)) {
           this.users = response.data.data.users;
         }
       } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error("Error fetching users:", error);
       }
     },
     selectReceiver(user) {
       this.selectedReceiver = user;
       this.fetchMessages();
-      this.replies = []; // Clear previous replies when switching users
     },
     async fetchMessages() {
       if (!this.selectedReceiver) return;
       try {
         const receiverId = this.selectedReceiver.id;
 
-        const response = await axios.get('http://127.0.0.1:8000/chat/api/conversation-messages/', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-          params: {
-            receiver_id: receiverId,
-            sender_id: this.user.id,
-          },
-        });
+        const sentMessagesResponse = await axios.get(
+          "http://127.0.0.1:8000/chat/api/conversation-messages/",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+            params: {
+              sender_id: this.user.id,
+              receiver_id: receiverId,
+            },
+          }
+        );
 
-        this.messages = response.data;
-        this.fetchReplies(); // Fetch replies from the selected receiver
+        const receivedMessagesResponse = await axios.get(
+          "http://127.0.0.1:8000/chat/api/conversation-messages/",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+            params: {
+              sender_id: receiverId,
+              receiver_id: this.user.id,
+            },
+          }
+        );
+
+        // Combine and sort messages by timestamp
+        this.messages = [
+          ...sentMessagesResponse.data,
+          ...receivedMessagesResponse.data,
+        ].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
       } catch (error) {
-        console.error('Error fetching messages:', error);
+        console.error("Error fetching messages:", error);
       }
-    },
-    async fetchReplies() {
-      if (!this.selectedReceiver) return;
-      try {
-        const receiverId = this.selectedReceiver.id;
-
-        const response = await axios.get('http://127.0.0.1:8000/chat/api/conversation-messages/', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-          params: {
-            sender_id: receiverId, // Get replies from the selected user
-            receiver_id: this.user.id,
-          },
-        });
-
-        this.replies = response.data; // Store the replies
-      } catch (error) {
-        console.error('Error fetching replies:', error);
-      }
-    },
-    startMessagePolling() {
-      // Polling to fetch new messages every 5 seconds
-      setInterval(() => {
-        if (this.selectedReceiver) {
-          this.fetchMessages();
-          this.fetchReplies();
-        }
-      }, 2000);
     },
     async sendMessage() {
       if (!this.selectedReceiver || !this.newMessage) return;
@@ -120,66 +107,81 @@ export default {
       };
 
       try {
-        const response = await axios.post('http://localhost:8000/chat/api/messages/', messageData, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-            'Content-Type': 'application/json',
-          },
-        });
+        const response = await axios.post(
+          "http://localhost:8000/chat/api/messages/",
+          messageData,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         this.messages.push({
           id: response.data.id,
-          sender_name: this.user.name,
+          sender: this.user.id,
           content: this.newMessage,
-          timestamp: new Date().toISOString(), // Add timestamp to new messages
+          timestamp: new Date().toISOString(),
         });
 
-        this.newMessage = '';
+        this.newMessage = "";
       } catch (error) {
-        console.error('Error sending message:', error);
+        console.error("Error sending message:", error);
       }
     },
-    // Method to format timestamp into HH:mm AM/PM format
-    formatTime(timestamp) {
-      const date = new Date(timestamp);
-      const options = { hour: '2-digit', minute: '2-digit', hour12: true };
-      return date.toLocaleTimeString([], options);
-    }
-  }
+    startMessagePolling() {
+      setInterval(() => {
+        if (this.selectedReceiver) {
+          this.fetchMessages();
+        }
+      }, 2000); // Poll every 2 seconds
+    },
+  },
 };
 </script>
 
 
 
 <template>
-  <v-container class="chat-container" style="margin-top: 60px;">
+  <v-container style="margin-top: 60px;">
     <v-row>
+      <!-- User List Section -->
       <v-col cols="12" md="4">
         <v-card class="mb-3 inbox-card timeline-card" elevation="5">
+          <!-- Card Title -->
           <v-card-title>
             <div class="headline inbox-title">
               <v-icon class="mr-1" color="#0b2e33">mdi-account-multiple</v-icon> Available Users
             </div>
           </v-card-title>
-          
+
           <!-- User List -->
           <v-list style="background-color: #4f7c82;">
+            <!-- Display Users If Available -->
             <v-list-item-group v-if="filteredUsers.length > 0">
-              <v-list-item v-for="user in filteredUsers" :key="user.id" @click="selectReceiver(user)" class="inbox-item">
+              <v-list-item
+                v-for="user in filteredUsers"
+                :key="user.id"
+                @click="selectReceiver(user)"
+                class="inbox-item"
+              >
+                <!-- User Avatar -->
                 <v-list-item-avatar>
                   <v-img :src="user.avatar" />
                 </v-list-item-avatar>
+
+                <!-- User Name -->
                 <v-list-item-content>
-                  <!-- Display User Name -->
-                  <v-list-item-title> 
-                    <v-icon style="color: #b8e8e9;">mdi-account</v-icon> 
+                  <v-list-item-title>
+                    <v-icon style="color: #b8e8e9;">mdi-account</v-icon>
                     {{ user.name }}
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-list-item-group>
-            
-            <!-- If no users are available -->
+
+            <!-- Display No Conversations Message -->
             <v-list-item v-else>
               <v-list-item-content>
                 <v-list-item-title>No conversations available...</v-list-item-title>
@@ -189,88 +191,73 @@ export default {
         </v-card>
       </v-col>
 
-      <!-- Chat Section -->
+      <!-- Message Section -->
       <v-col cols="12" md="8">
-        
-       <!-- Chat Card for Selected User -->
-        <v-card v-if="selectedReceiver" class="chat-card" elevation="3" style="background-color: #4f7c82; border: 5px solid #b8e8e9; height: 500px;">
-
-        <!-- Title Section -->
-        <v-card-title class="d-flex align-center" style="color: #0b2e33;">
-          <div>
-            <div class="chat-title" style="font-weight: 900;">
-              <v-icon size="28px">mdi-message-bulleted</v-icon> SnapTalk
+        <!-- Chat Card: Display When User is Selected -->
+        <v-card v-if="selectedReceiver" class="chat-section" elevation="3" style="background-color: #0b2e33;">
+          <!-- Chat Header -->
+          <v-card-title class="d-flex align-center chat-header">
+            <div>
+              <!-- Chat Title -->
+              <div class="chat-title-main">
+                <v-icon size="28px">mdi-message-bulleted</v-icon> SnapTalk
+              </div>
+              <div class="headline chat-title">
+                Start a conversation with <strong>{{ selectedReceiver.name }}</strong>
+              </div>
             </div>
-            <div class="headline chat-title">
-              Start a conversation with <strong>{{ selectedReceiver.name }}</strong>
+          </v-card-title>
+
+          <!-- Messages Display -->
+          <div class="chat-body">
+            <!-- Loop Through Messages -->
+            <div
+              v-for="message in messages"
+              :key="message.id"
+              :class="{
+                'message-item': true,
+                'sender': message.sender === user.id,
+                'receiver': message.sender !== user.id
+              }"
+            >
+              <!-- Message Bubble -->
+              <div class="message-bubble">
+                {{ message.content }}
+                <!-- Timestamp -->
+                <div class="timestamp">
+                  {{ new Date(message.timestamp).toLocaleString() }}
+                </div>
+              </div>
             </div>
           </div>
-        </v-card-title>
 
-        <!-- Message Section -->
-        <v-card-subtitle style="padding: 0; height: calc(80% - 80px); overflow-y: auto;">
-          <v-scroll-y class="message-list" style="max-height: 100%; overflow-y: auto;">
-            <v-list>
-              <v-list-item-group v-if="messages && messages.length > 0">
-                <v-list-item v-for="message in messages" :key="message.id" class="message-item">
-                  <v-list-item-content>
-                    <!-- Message Content -->
-                    <v-list-item-title>
-                      <v-card :class="{
-                        'sender-message': message.sender === 'me', 
-                        'receiver-message': message.sender !== 'me', 
-                        'small-card': message.sender !== 'me'
-                      }" class="pa-3 mb-3">
-                        <div class="message-content">{{ message.content }}</div>
-                      </v-card>
-                    </v-list-item-title>
-
-                    <!-- Message Metadata (Time and Receiver) -->
-                    <div class="message-meta">
-                      <span style="margin-right: 10px;">{{ formatTime(message.timestamp) }}</span>
-                      <span style="margin-right: 700px;">Sent to: {{ message.receiver }}</span>
-                    </div>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-list-item-group>
-
-              <!-- If no messages available -->
-              <v-list-item v-else>
-                <v-list-item-content>
-                  <v-list-item-title>No messages yet...</v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-          </v-scroll-y>
-        </v-card-subtitle>
-
-        <!-- Message Input Section -->
-        <v-card-actions class="d-flex align-center">
-          <v-textarea v-model="newMessage" label="Message" rows="1" outlined dense class="message-input" />
-          <v-btn @click="sendMessage" :disabled="!newMessage" class="send-btn">
-            <v-icon left class="mr-1">mdi-send</v-icon> Send
-          </v-btn>
-        </v-card-actions>
-
+          <!-- Send Message Section -->
+          <div class="chat-footer" style="display: flex; align-items: center;">
+            <!-- Message Input -->
+            <v-textarea
+              v-model="newMessage"
+              placeholder="Type a message..."
+              rows="1"
+              outlined
+              dense
+              class="message-input"
+              style="width: 70%; max-width: 650px; margin-left: 10px; margin-right: 25px; margin-top: 15px;"
+            />
+            <!-- Send Button -->
+            <v-btn @click="sendMessage" :disabled="!newMessage" class="send-btn">
+              <v-icon left>mdi-send</v-icon>
+            </v-btn>
+          </div>
         </v-card>
 
-
-        <!-- No Replies Card -->
-        <v-card v-else class="pa-3 mt-3 no-replies-card" elevation="2">
-          <v-card-title>
-            <div class="headline">No replies yet</div>
-          </v-card-title>
-        </v-card>
-
-        <!-- No User Selected -->
+        <!-- No User Selected: Placeholder Card -->
         <v-card v-else class="pa-3" elevation="5" style="background-color: #4f7c82;">
           <v-card-title>
             <div class="card-content">
-              <!-- Image on the left side -->
-              <v-img src="/src/images/robot.png" alt="No user selected" class="left-img" style="max-width: 80%;"/>
-
-              <!-- Content on the right side -->
+              <!-- Placeholder Image -->
+              <v-img src="/src/images/robot.png" alt="No user selected" class="left-img" style="max-width: 80%;" />
               <div class="right-content">
+                <!-- Welcome Message -->
                 <div class="headline" style="font-size: 20px;">Welcome to SnapTalk – Start Seamless Conversations</div>
                 <div class="caption">
                   Select a user from inbox to start a secure, private conversation here on SnapTalk.
@@ -288,111 +275,6 @@ export default {
 
 
 <style scoped>
-.timeline-card {
-  position: relative;
-  border: 3px solid #b8e8e9;
-  background-color: #b8e8e9;
-}
-
-.timeline-card .inbox-item {
-  position: relative;
-  padding-left: 20px;
-  margin-bottom: 10px;
-}
-
-.timeline-card .inbox-title {
-  color: #0b2e33;
-  font-weight: bold;
-  margin-left: 55px;
-}
-
-.inbox-item .v-list-item-title {
-  color: #ffffff;
-}
-
-.sender-message {
-  background-color: #DCF8C6;
-  align-self: flex-end;
-}
-
-.receiver-message {
-  background-color: #FFFFFF;
-  align-self: flex-start;
-}
-
-.small-card {
-  max-width: 250px;
-  min-width: 150px;
-  padding: 10px;
-  margin-right: 10px;
-  border-radius: 8px;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  display: inline-block;
-}
-
-.message-content {
-  font-size: 14px;
-  color: #333;
-  word-wrap: break-word;
-  white-space: normal;
-}
-
-.message-meta {
-  font-size: 13px;
-  color: #888;
-  display: flex;
-  justify-content: space-between;
-  margin-top: -10px;
-}
-
-.message-list {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.chat-card {
-  display: flex;
-  flex-direction: column;
-  padding: 16px;
-}
-
-.send-btn {
-  margin-left: 10px;
-  border: 1px solid #0b2e33;
-  background-color: #4f7c82;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 25px;
-  font-weight: 600;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  transition: background-color 0.3s ease, transform 0.2s;
-}
-
-.send-btn:hover {
-  background-color: #0b2e33;
-  transform: scale(1.05);
-}
-
-.no-replies-card, .no-user-card {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.no-replies-card .headline, .no-user-card .headline {
-  font-size: 18px;
-  color: #888;
-}
-
-.message-input {
-  margin-top: 20px;
-}
-
 .card-content {
   display: flex;
   align-items: center;
@@ -419,5 +301,138 @@ export default {
   font-size: 14px;
   color: #b8e8e9;
 }
+
+.timeline-card {
+  position: relative;
+  border: 3px solid #b8e8e9;
+  background-color: #b8e8e9;
+}
+
+.timeline-card .inbox-item {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.timeline-card .inbox-title {
+  color: #0b2e33;
+  font-weight: bold;
+  margin-left: 55px;
+}
+
+.inbox-item .v-list-item-title {
+  color: #ffffff;
+}
+
+
+
+
+/* Overall chat container */
+.chat-section {
+  display: flex;
+  flex-direction: column;
+  height: 85vh;
+  border-radius: 8px;
+  padding: 0;
+  border: 2px solid #b8e8e9;
+}
+
+/* Chat Header */
+.chat-header {
+  background-color: #b8e8e9;
+  padding: 10px;
+  border-radius: 8px 8px 0 0;
+}
+
+.chat-title-main {
+  font-weight: bold;
+  color: #0b2e33;
+}
+
+.chat-title {
+  font-size: 1.1rem;
+  color: #0b2e33;
+  font-weight: normal;
+}
+
+.chat-body {
+  padding: 20px;
+  max-height: 500px;
+  overflow-y: auto;
+  background-color: #4f7c82;
+}
+
+.message-item {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.receiver .message-bubble {
+  margin-right: auto;
+  background-color: #e5e5ea;
+  color: black;
+  border-radius: 18px 18px 18px 0;
+  max-width: 60%;
+  padding: 10px 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.message-bubble {
+  position: relative;
+  word-wrap: break-word;
+  font-size: 14px;
+}
+
+.timestamp {
+  font-size: 11px;
+  color: #888;
+  margin-top: 5px;
+  text-align: right;
+}
+.receiver .timestamp {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* Footer Section (message input) */
+.chat-footer {
+  display: flex;
+  align-items: center;
+  padding: 0px;
+  background-color: #b8e8e9;
+}
+
+.message-input {
+  flex: 1;
+  margin-right: 15px;
+  color: #0b2e33;
+}
+
+.send-btn {
+  background-color: #0b2e33;
+  color: white;
+}
+
+.send-btn:disabled {
+  background-color: #e5e5ea;
+  color: #0b2e33;
+}
+
+/* Small tweaks for overall spacing */
+.v-btn {
+  border-radius: 30px;
+}
+
+.v-textarea {
+  background-color: #b8e8e9;
+  margin-top: 10px;
+  margin-right: -5px;
+}
+
+
+.chat-footer .message-input {
+  width: 70% !important; /* Ensures it overrides Vuetify's default styles */
+  max-width: 600px; /* Optional: Limits the maximum width */
+}
+
 </style>
 
