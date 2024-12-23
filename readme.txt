@@ -18,20 +18,22 @@ An intuitive interface displays and manages all users and messages.
 Requirements:
 To set up and run the applications, follow these steps:
 
-1.	Clone the Repository
+1.Clone the Repository
 git clone <repository-url>  
 cd <repository-folder>  
 
-2.	Set Up the Backend
+2.Set Up the Backend
 Navigate to the backend folder and execute the following commands:
+
 cd backend  
 python -m venv venv  
 pip install -r requirements.txt  
 python manage.py migrate  
 python manage.py runserver  
 
-3.	Test Accounts for Login
+3.Test Accounts for Login
 Use the following test accounts for authentication and testing:
+
 o	Account 1
 Email: test@gmail.com
 Password: test123/.
