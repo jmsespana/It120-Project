@@ -17,6 +17,7 @@ An intuitive interface displays and manages all users and messages.
 
 Requirements:
 To set up and run the applications, follow these steps:
+
 1.	Clone the Repository
 git clone <repository-url>  
 cd <repository-folder>  
