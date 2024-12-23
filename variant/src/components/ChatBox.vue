@@ -116,6 +116,17 @@ export default {
         console.error('Error deleting message:', error);
       }
     },
+    getSenderName(senderId) {
+    if (senderId === this.user.id) {
+      return 'You'; // If the message is sent by the logged-in user
+    }
+    const sender = this.users.find(user => user.id === senderId);
+    return sender ? sender.name : 'Unknown';
+  },
+    getReceiverName(senderId) {
+      const receiver = this.users.find(user => user.id === senderId);
+      return receiver ? receiver.name : 'Unknown';
+    },
     startMessagePolling() {
       setInterval(() => {
         if (this.selectedReceiver) {
@@ -165,7 +176,7 @@ export default {
         <v-card class="mb-3 inbox-card timeline-card" elevation="5">
           <v-card-title>
             <div class="headline inbox-title">
-              <v-icon class="mr-1" color="#0b2e33">mdi-account-multiple</v-icon> Available Users
+              <v-icon class="mr-1" color="#0b2e33">mdi-account-multiple</v-icon>Users
             </div>
           </v-card-title>
 
@@ -226,22 +237,46 @@ export default {
                 'receiver': message.sender !== user.id
               }"
             >
-              <div class="message-bubble" :class="{'sent': message.sender === user.id}">
-                {{ message.content }}
+              <div class="message-bubble" :class="{'sent': message.sender === user.id}">  
+                <!-- User Icon -->
+                <v-icon 
+                  class="user-icon" 
+                  style="font-size: 24px; margin-right: 8px; vertical-align: middle; color: #0b2e33;"
+                >
+                  mdi-account-circle
+                </v-icon>
+
+                <!-- Message Content -->
+                <span class="message-content">
+                  {{ message.content }}
+                </span>
+
+                <!-- Timestamp -->
                 <div class="timestamp">
                   {{ new Date(message.timestamp).toLocaleString() }}
                 </div>
-                <v-icon 
-                  class="delete-icon" 
-                  @click="deleteMessage(message.id)" 
-                  color="red" 
-                  style="font-size: medium; margin-right: 8px;"
-                >
-                  mdi-delete-outline
-                </v-icon>
+                
+                <!-- Delete Icon and 'Sent by: Sender Name' -->
+                <div class="message-footer">
+                  <v-icon 
+                    class="delete-icon" 
+                    @click="deleteMessage(message.id)" 
+                    color="red" 
+                    style="font-size: medium; margin-right: 8px;"
+                  >
+                    mdi-delete-outline
+                  </v-icon>
+                  
+                  <span v-if="message.sender !== user.id" class="sent-by">
+                    Sent by: {{ getSenderName(message.sender) }}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
+
+
+
 
           <div class="chat-footer" style="display: flex; align-items: center;">
             <v-textarea 
@@ -292,6 +327,12 @@ export default {
 
 
 <style scoped>
+.sent-by {
+  font-size: 10px;
+  color: #555;
+  margin-left: -11px;
+}
+
 .receiver .message-bubble {
   background-color: #b8e8e9;
   color: #000;
@@ -343,7 +384,7 @@ export default {
 .timeline-card .inbox-title {
   color: #0b2e33;
   font-weight: bold;
-  margin-left: 55px;
+  margin-left: 105px;
 }
 
 .inbox-item .v-list-item-title {
